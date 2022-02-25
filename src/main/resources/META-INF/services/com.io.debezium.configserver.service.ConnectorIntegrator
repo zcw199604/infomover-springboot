@@ -1,0 +1,3 @@
+com.io.debezium.configserver.service.postgres.PostgresConnectorIntegrator
+com.io.debezium.configserver.service.mysql.MySqlConnectorIntegrator
+com.io.debezium.configserver.service.oracle.OracleConnectorIntegrator
