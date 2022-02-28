@@ -14,9 +14,9 @@ import com.info.infomover.prom.response.PromResult;
 import com.info.infomover.prom.response.PromResultConverter;
 import com.info.infomover.repository.JobRepository;
 import com.info.infomover.repository.UserRepository;
+import com.info.infomover.security.SecurityUtils;
 import com.info.infomover.service.JobService;
 import com.info.infomover.util.ConnectorUtil;
-import com.info.infomover.util.UserUtil;
 import com.io.debezium.configserver.model.ConnectorStatus;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -73,7 +73,7 @@ public class DashboardResource {
         int connectorTotal = 0;
 
         List<Job> jobList;
-        User loginUser = userRepository.findByName(UserUtil.getUserName());
+        User loginUser = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         if (User.Role.User.name().equals(loginUser.getRole())) {
             jobList = jobRepository.findByCreatorId(loginUser.getId());
         } else {
@@ -144,7 +144,7 @@ public class DashboardResource {
     public Response promMetric( @RequestParam(value = "start",required = false)  Long start, @RequestParam(value = "end",required = false)  Long end,
                                @RequestBody List<Long> jobIds) {
 
-        Map<String, Map<String, String>> metricConnector = loadDeployedJob(jobIds, UserUtil.getUserName());
+        Map<String, Map<String, String>> metricConnector = loadDeployedJob(jobIds, SecurityUtils.getCurrentUserUsername());
 
         long range = (end - start) / 1000;
         int step;

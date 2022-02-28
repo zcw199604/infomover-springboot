@@ -18,6 +18,7 @@ import com.info.infomover.entity.Job;
 import com.info.infomover.entity.StepDesc;
 import com.info.infomover.entity.User;
 import com.info.infomover.repository.UserRepository;
+import com.info.infomover.security.SecurityUtils;
 import com.info.infomover.sink.KafkaCluster;
 import com.info.infomover.util.UserUtil;
 import com.io.debezium.configserver.model.*;
@@ -104,7 +105,7 @@ public class ConnectorResource {
             ))*/
     public Response getClusters() {
         if (UserUtil.getUserRole().equals((User.Role.User.name()))) {
-            User user = userRepository.findByName(UserUtil.getUserName());
+            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
             return Response.ok(KafkaConnectClientFactory.getAllKafkaConnectClusters(user.getId())).build();
         } else {
             return Response.ok(KafkaConnectClientFactory.getAllKafkaConnectClusters(null)).build();

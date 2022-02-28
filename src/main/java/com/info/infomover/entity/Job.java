@@ -20,7 +20,7 @@ public class Job extends AbstractPersistable<Long> implements Serializable {
     private static final long serialVersionUID = 7717258955316291521L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY,generator="hibernate_sequence")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator="hibernate_sequence")
     @SequenceGenerator(name="hibernate_sequence", sequenceName="seq_hibernate")
     private Long id;
 

@@ -87,9 +87,8 @@ public class RecollectJobLauncher implements Runnable {
     public void run() {
         long startTime = System.currentTimeMillis();
         log.info("Start to recollect jobId {} thread {}, startTime {}......", jobId, Thread.currentThread().getId(), startTime);
-
+        Job finalJob = jobService.findJobByIdAndLoadConnector(jobId);
         try {
-            Job finalJob = jobService.findJobByIdAndLoadConnector(jobId);
 
             //
             // 修改source connect 的 snapshot.mode 为 when_needed

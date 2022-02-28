@@ -5,10 +5,11 @@ import com.info.infomover.entity.QUser;
 import com.info.infomover.entity.User;
 import com.info.infomover.jwt.TokenUtils;
 import com.info.infomover.repository.UserRepository;
+import com.info.infomover.security.SecurityUtils;
+import com.info.infomover.security.authentication.JwtTokenGenerater;
 import com.info.infomover.service.UserService;
 import com.info.infomover.util.AesUtils;
 import com.info.infomover.util.CheckUtil;
-import com.info.infomover.util.UserUtil;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -63,6 +64,9 @@ public class UserResource {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JwtTokenGenerater jwtTokenGenerater;
 
     @GetMapping
     @RolesAllowed({"Admin"})
@@ -127,13 +131,13 @@ public class UserResource {
         if (user == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        if ("admin".equalsIgnoreCase(user.getRole()) && !UserUtil.getUserName().equals(user.name)) {
+        if ("admin".equalsIgnoreCase(user.getRole()) && !"DESC".equals(user.name)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         return Response.ok(user).build();
     }
 
-    @PostMapping("/login")
+    //@PostMapping("/login")
     public Response login(@RequestParam("username") String name, @RequestParam("password") String pwd) {
         User user = userRepository.findByName(name);
         if (user != null && user.status == User.Status.ENABLED) {
@@ -159,7 +163,7 @@ public class UserResource {
     @Resource
     private AuthenticationManager authenticationManager;
 
-    @PostMapping("/toDoLogin")
+    //@PostMapping("/toDoLogin")
     public Response toDoLogin(@RequestParam("username") String name, @RequestParam("password") String pwd) {
         // 用户验证
         Authentication authentication = null;
@@ -190,15 +194,15 @@ public class UserResource {
         return Response.status(Response.Status.UNAUTHORIZED).build();
     }
 
-    @PostMapping("/renew")
-    @RolesAllowed({"User", "Admin"})
+    //@PostMapping("/renew")
+    //@RolesAllowed({"User", "Admin"})
     public Response renew() {
         Map<String, Object> map = new HashMap<String, Object>();
         try {
-            String curUserName = UserUtil.getUserName();
+            String curUserName = SecurityUtils.getCurrentUserUsername();
             User user = userRepository.findByName(curUserName);
             if (user != null && user.status == User.Status.ENABLED) {
-                map.put("token", TokenUtils.generateToken(user.name, Set.of(user.role), duration, issuer));
+                //map.put("token", jwtTokenGenerater.generateToken(user.name,user.getId(), Set.of(user.role)));
                 map.put("role", user.role);
                 map.put("expiresIn", duration);
                 return Response.ok(map).build();
@@ -236,7 +240,7 @@ public class UserResource {
     @Transactional
     public Response changePwd(@RequestParam("userid") long uid, @RequestParam("oldPass") String oldPwd, @RequestParam("newPass") String newPwd) {
         try {
-            String curUserName = UserUtil.getUserName();
+            String curUserName = "DESC";
             userService.updatePassword(curUserName, uid, AesUtils.wrappeDaesDecrypt(oldPwd), AesUtils.wrappeDaesDecrypt(newPwd));
             return Response.ok().build();
         } catch (Exception e) {
@@ -251,7 +255,7 @@ public class UserResource {
     @Transactional
     public Response changeEmail(@RequestParam("userid") Long uid, @RequestParam("email") String email) {
         try {
-            String curUserName = UserUtil.getUserName();
+            String curUserName = "DESC";
             userService.updateEmail(curUserName, uid, email);
             return Response.ok().build();
         } catch (Exception e) {
@@ -268,7 +272,7 @@ public class UserResource {
         try {
             User user = userRepository.findById(uid).get();
             if ("admin".equalsIgnoreCase(user.getRole())) {
-                throw new RuntimeException("wrong operation with user " + UserUtil.getUserName());
+                throw new RuntimeException("wrong operation with user " + "DESC");
             }
             userService.enableAdmin(uid, isAdmin);
             return Response.ok().build();
@@ -286,7 +290,7 @@ public class UserResource {
         try {
             User user = userRepository.findById(Long.valueOf(uid)).get();
             if ("admin".equalsIgnoreCase(user.getRole())) {
-                throw new RuntimeException("wrong operation with user " + UserUtil.getUserName());
+                throw new RuntimeException("wrong operation with user " + "DESC");
             }
             userService.enableUser(Long.valueOf(uid), enable);
             return Response.ok().build();

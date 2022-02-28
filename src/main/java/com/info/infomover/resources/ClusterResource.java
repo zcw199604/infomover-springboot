@@ -5,8 +5,8 @@ import com.info.infomover.loadbalancer.LoadBalancerFactory;
 import com.info.infomover.repository.ClusterRepository;
 import com.info.infomover.repository.JobRepository;
 import com.info.infomover.repository.UserRepository;
+import com.info.infomover.security.SecurityUtils;
 import com.info.infomover.service.JobService;
-import com.info.infomover.util.UserUtil;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -78,7 +78,7 @@ public class ClusterResource {
         //校验sasl参数
         validateSasl(cluster);
 
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         cluster.setId(null);
         cluster.creatorId = user.getId();
         cluster.creatorChineseName = user.chineseName;
@@ -106,7 +106,7 @@ public class ClusterResource {
                         .build();
             }
         }
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         Cluster oldCluster = clusterRepository.findById(cluster.getId()).get();
         if (oldCluster == null) {
             throw new IllegalArgumentException("can't find cluster by id: " + cluster.getId());
@@ -171,10 +171,10 @@ public class ClusterResource {
 
         QCluster cluster = QCluster.cluster;
         JPAQuery<Cluster> from = queryFactory.select(cluster).from(cluster);
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         if (User.Role.User.name().equals(user.getRole())) {
             if (user == null) {
-                throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+                throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
             }
             from.where(cluster.creatorId.eq(user.getId()));
         }
@@ -219,9 +219,9 @@ public class ClusterResource {
         if (ids == null || ids.length == 0) {
             return Response.status(Response.Status.BAD_REQUEST).entity("ids can't be null or empty").build();
         }
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         if (user == null) {
-            throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+            throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
         }
         for (Long id : ids) {
             Cluster cluster = clusterRepository.findById(id.longValue()).get();
@@ -246,9 +246,9 @@ public class ClusterResource {
         if (ids == null || ids.length == 0) {
             return Response.status(Response.Status.BAD_REQUEST).entity("ids can't be null or empty").build();
         }
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         if (user == null) {
-            throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+            throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
         }
         for (Long id : ids) {
             Cluster cluster = clusterRepository.findById(id.longValue()).get();
@@ -285,12 +285,12 @@ public class ClusterResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(clusterAndJobName).build();
         }
 
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         for (Long id : ids) {
             Cluster cluster = clusterRepository.findById(id.longValue()).get();
             if (user.getRole().equals(User.Role.User.name().equals(user.getRole()))) {
                 if (user == null) {
-                    throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+                    throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
                 if (user.getId().longValue() != cluster.creatorId.longValue()) {
                     throw new RuntimeException("no available cluster for user " + user.chineseName);

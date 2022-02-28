@@ -2,6 +2,7 @@ package com.info.infomover.service.impl;
 
 import com.info.infomover.datasource.IDatasource;
 import com.info.infomover.entity.*;
+import com.info.infomover.repository.ConnectorRepository;
 import com.info.infomover.repository.DataSourceRepository;
 import com.info.infomover.repository.JobRepository;
 import com.info.infomover.service.JobService;
@@ -30,6 +31,9 @@ public class JobServiceImpl implements JobService {
     private JobRepository jobRepository;
 
     @Autowired
+    private ConnectorRepository connectorRepository;
+
+    @Autowired
     private JPAQueryFactory queryFactory;
 
     @Override
@@ -37,30 +41,32 @@ public class JobServiceImpl implements JobService {
     public List<Connector> findSourceConnectors(Job job) {
 
         List<Connector> list = new ArrayList<>();
+
         for (int i = 0; i < job.getConnectors().size(); i++) {
-            Connector connector = new Connector();
-            BeanUtils.copyProperties(job.getConnectors().get(i), connector);
-            list.add(connector);
+            if (job.getConnectors().get(i).category == Connector.Category.Source) {
+                Connector temp = new Connector();
+                BeanUtils.copyProperties(job.getConnectors().get(i), temp);
+                list.add(temp);
+            }
         }
-        List<Connector> sourceConnectors = list.stream()
-                .filter(connector -> connector.category == Connector.Category.Source)
-                .collect(Collectors.toList());
-        return sourceConnectors;
+        List<Long> collect = job.getConnectors().stream()
+                .filter(connector -> connector.category == Connector.Category.Source).map(item -> item.getId()).collect(Collectors.toList());
+
+
+
+        List<Connector> allById = connectorRepository.findAllById(collect);
+        return allById;
     }
 
     @Override
     @Transactional
     public List<Connector> findSinkConnectors(Job job) {
-        List<Connector> list = new ArrayList<>();
-        for (int i = 0; i < job.getConnectors().size(); i++) {
-            Connector connector = new Connector();
-            BeanUtils.copyProperties(job.getConnectors().get(i), connector);
-            list.add(connector);
-        }
-        List<Connector> sinkConnectors = list.stream()
-                .filter(connector -> connector.category == Connector.Category.Sink)
-                .collect(Collectors.toList());
-        return sinkConnectors;
+        List<Long> collect = job.getConnectors().stream()
+                .filter(connector -> connector.category == Connector.Category.Sink).map(item -> item.getId()).collect(Collectors.toList());
+
+
+        List<Connector> allById = connectorRepository.findAllById(collect);
+        return allById;
     }
 
 
@@ -69,14 +75,16 @@ public class JobServiceImpl implements JobService {
         if (CollectionUtils.isEmpty(job.getConnectors())) {
             throw new RuntimeException("job connectors is null");
         }
-        List<Connector> sourceConnectors = job.getConnectors().stream()
-                .filter(connector -> connector.category == Connector.Category.Source)
-                .collect(Collectors.toList());
+        List<Long> collect = job.getConnectors().stream()
+                .filter(connector -> connector.category == Connector.Category.Source).map(item -> item.getId()).collect(Collectors.toList());
 
-        CheckUtil.checkTrue(CollectionUtils.isEmpty(sourceConnectors),"job connectors does not contain source connector");
-        CheckUtil.checkTrue(sourceConnectors.size() != 1,"job source connector size greater than 1 ");
 
-        return sourceConnectors.get(0);
+        List<Connector> allById = connectorRepository.findAllById(collect);
+
+        CheckUtil.checkTrue(CollectionUtils.isEmpty(allById),"job connectors does not contain source connector");
+        CheckUtil.checkTrue(allById.size() != 1,"job source connector size greater than 1 ");
+
+        return allById.get(0);
     }
 
     @Override

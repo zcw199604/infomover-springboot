@@ -8,6 +8,7 @@ import com.info.infomover.param.JobDeployParam;
 import com.info.infomover.recollect.RecollectJobLauncher;
 import com.info.infomover.repository.*;
 import com.info.infomover.resources.response.ActionStatus;
+import com.info.infomover.security.SecurityUtils;
 import com.info.infomover.service.ConnectorService;
 import com.info.infomover.service.JobService;
 import com.info.infomover.util.*;
@@ -173,7 +174,7 @@ public class JobResource {
 
         QJob jobT = QJob.job;
         JPAQuery<Job> from = queryFactory.select(jobT).from(jobT);
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         if (User.Role.User.name().equals(user.getRole())) {
             if (user == null) {
                 throw new RuntimeException("no user found with name " + User.Role.User.name().equals(user.getRole()));
@@ -227,6 +228,7 @@ public class JobResource {
         Page<Job> list = Page.of(jobQueryResults.getResults(), jobQueryResults.getTotal(), jobQueryResults.getLimit());
 
         for (Job job : list.content) {
+            String project = job.getProject();
             Map<String, Object> alertParam = new HashMap<>();
             alertParam.put("jobId", job.getId());
             alertParam.put("status", Alert.AlertStatus.firing);
@@ -259,10 +261,10 @@ public class JobResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         if (User.Role.User.name().equals(user.getRole())) {
             if (user == null) {
-                throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+                throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
             }
             if (user.getId().longValue() != job.getCreatorId().longValue()) {
                 throw new RuntimeException("no available connector for user " + user.chineseName);
@@ -275,7 +277,7 @@ public class JobResource {
     @Transactional
     @RolesAllowed({"User", "Admin"})
     public Response create( @RequestBody Job job) {
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         if (jobRepository.countByName(job.getName()) > 0) {
             throw new RuntimeException("job name " + job.getName() + " is existed");
         }
@@ -377,7 +379,7 @@ public class JobResource {
     @RolesAllowed({"User", "Admin"})
     @Log(action = LogConst.ACTION_UPDATE, itemId = "#job.id", description = "更新job对象", param = "#job.name")
     public Response update( @RequestBody Job job) {
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         //取出datasource参数放入Connector中
         jobService.stepsToConnector(job, topicPrefix);
         //将sink connector拆分成具体的deploy connector
@@ -512,10 +514,10 @@ public class JobResource {
         for (Long jobId : jobIds) {
 
             Job userJob = jobRepository.findById(jobId.longValue()).get();
-            User user = userRepository.findByName(UserUtil.getUserName());
+            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
             if (User.Role.User.name().equals(user.getRole())) {
                 if (user == null) {
-                    throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+                    throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
                 if (user.getId().longValue() != userJob.getCreatorId().longValue()) {
                     throw new RuntimeException("no available connector for user " + user.chineseName);
@@ -642,10 +644,10 @@ public class JobResource {
     public Response rebuild(@RequestBody Long[] jobIds) {
         for (Long jobId : jobIds) {
             Job userJob = jobService.findJobByIdAndLoadConnector(jobId.longValue());
-            User user = userRepository.findByName(UserUtil.getUserName());
+            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
             if (User.Role.User.name().equals(user.getRole())) {
                 if (user == null) {
-                    throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+                    throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
                 if (user.getId().longValue() != userJob.getCreatorId().longValue()) {
                     throw new RuntimeException("no available connector for user " + user.chineseName);
@@ -921,10 +923,10 @@ public class JobResource {
         List<ActionStatus> response = new ArrayList<>();
         for (Long jobId : jobDeployParam.getJobIds()) {
             Job job = jobRepository.findById(jobId.longValue()).get();
-            User user = userRepository.findByName(UserUtil.getUserName());
+            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
             if (User.Role.User.name().equals(user.getRole())) {
                 if (user == null) {
-                    throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+                    throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
                 if (user.getId().longValue() != job.getCreatorId().longValue()) {
                     throw new RuntimeException("no available connector for user " + user.chineseName);
@@ -1214,10 +1216,10 @@ public class JobResource {
     public Response pause(@RequestBody Long[] jobIds) {
         for (Long jobId : jobIds) {
             Job job = jobRepository.findById(jobId.longValue()).get();
-            User user = userRepository.findByName(UserUtil.getUserName());
+            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
             if (User.Role.User.name().equals(user.getRole())) {
                 if (user == null) {
-                    throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+                    throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
                 if (user.getId().longValue() != job.getCreatorId().longValue()) {
                     throw new RuntimeException("no available connector for user " + user.chineseName);
@@ -1295,10 +1297,10 @@ public class JobResource {
     public Response resume(@RequestBody Long[] jobIds) {
         for (Long jobId : jobIds) {
             Job job = jobRepository.findById(jobId.longValue()).get();
-            User user = userRepository.findByName(UserUtil.getUserName());
+            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
             if (User.Role.User.name().equals(user.getRole())) {
                 if (user == null) {
-                    throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+                    throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
                 if (user.getId().longValue() != job.getCreatorId().longValue()) {
                     throw new RuntimeException("no available connector for user " + user.chineseName);
@@ -1373,10 +1375,10 @@ public class JobResource {
     public Response restart( @RequestBody Long[] jobIds) {
         for (Long jobId : jobIds) {
             Job job = jobRepository.findById(jobId.longValue()).get();
-            User user = userRepository.findByName(UserUtil.getUserName());
+            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
             if (User.Role.User.name().equals(user.getRole())) {
                 if (user == null) {
-                    throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+                    throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
                 if (user.getId().longValue() != job.getCreatorId().longValue()) {
                     throw new RuntimeException("no available connector for user " + user.chineseName);
@@ -1443,8 +1445,8 @@ public class JobResource {
     @RolesAllowed({"User", "Admin"})
     @Log(action = LogConst.ACTION_DELETE, itemId = "#jobIds")
     public Response delete(@RequestBody Long[] jobIds, @RequestParam(value = "delAlert",required = false)  boolean delAlert, @RequestParam(value = "delTopic",required = false)  boolean delTopic) {
-        User user = userRepository.findByName(UserUtil.getUserName());
-        CheckUtil.checkTrue(user == null, "no user found with name " + UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
+        CheckUtil.checkTrue(user == null, "no user found with name " + SecurityUtils.getCurrentUserUsername());
 
         for (Long jobId : jobIds) {
             Job job = jobRepository.findById(jobId.longValue()).get();
@@ -1749,10 +1751,10 @@ public class JobResource {
         if (job == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         if (User.Role.User.name().equals(user.getRole())) {
             if (user == null) {
-                throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+                throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
             }
             if (user.getId().longValue() != job.getCreatorId().longValue()) {
                 throw new RuntimeException("no available connector for user " + user.chineseName);

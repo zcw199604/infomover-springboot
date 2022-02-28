@@ -7,6 +7,7 @@ import com.info.infomover.repository.AlertRepository;
 import com.info.infomover.repository.AlertRuleRepository;
 import com.info.infomover.repository.JobAlertRuleRepository;
 import com.info.infomover.repository.UserRepository;
+import com.info.infomover.security.SecurityUtils;
 import com.info.infomover.util.UserUtil;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
@@ -71,9 +72,9 @@ public class AlertRuleResource {
         QAlertRule alertRule = QAlertRule.alertRule;
         JPAQuery<AlertRule> from = queryFactory.select(alertRule).from(alertRule);
         if (UserUtil.getUserRole().equals(User.Role.User.name())) {
-            User user = userRepository.findByName(UserUtil.getUserName());
+            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
             if (user == null) {
-                throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+                throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
             }
             from.where(alertRule.creatorId.eq(user.getId()));
         }
@@ -99,9 +100,9 @@ public class AlertRuleResource {
     @Transactional
     @RolesAllowed({"User", "Admin"})
     public Response create(@RequestBody AlertRule rule) {
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         if (user == null) {
-            throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+            throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
         }
         rule.setId(null);
         rule.creator = user.name;
@@ -118,9 +119,9 @@ public class AlertRuleResource {
     @Transactional
     @RolesAllowed({"User", "Admin"})
     public Response update(@RequestBody AlertRule rule){
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         if (user == null) {
-            throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+            throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
         }
 
         if (AlertRule.RuleType.custom.equals(rule.type)) {
@@ -155,9 +156,9 @@ public class AlertRuleResource {
         if (ids == null || ids.length == 0) {
             return Response.status(Response.Status.BAD_REQUEST).entity("ids can't be null or empty").build();
         }
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         if (user == null) {
-            throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+            throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
         }
 
         for (Long id : ids) {

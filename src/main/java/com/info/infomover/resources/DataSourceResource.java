@@ -12,7 +12,11 @@ import com.info.infomover.repository.DataSourceRepository;
 import com.info.infomover.repository.JobRepository;
 import com.info.infomover.repository.UserRepository;
 import com.info.infomover.resources.response.PageResult;
-import com.info.infomover.util.*;
+import com.info.infomover.security.SecurityUtils;
+import com.info.infomover.util.AesUtils;
+import com.info.infomover.util.DataSourceKeyword;
+import com.info.infomover.util.DatasourceUtil;
+import com.info.infomover.util.JsonBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -74,7 +78,7 @@ public class DataSourceResource {
         LocalDateTime localDateTime = LocalDateTime.now();
         dataSource.createTime = localDateTime;
         dataSource.updateTime = localDateTime;
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         dataSource.creatorId = user.getId();
         dataSource.creatorChineseName = user.chineseName;
         dataSource.lastModifierId = user.getId();
@@ -102,7 +106,7 @@ public class DataSourceResource {
         dataSource.description = ds.description;
         dataSource.type = ds.type;
         dataSource.category = ds.category;
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         dataSource.lastModifierId = user.getId();
         dataSource.lastModifierName = user.chineseName;
         dataSource.updateTime = LocalDateTime.now();
@@ -163,10 +167,10 @@ public class DataSourceResource {
             @RequestParam(value = "state",required = false)  DataSource.DataSourceState state) {
         QDataSource dataSource = QDataSource.dataSource;
         JPAQuery<DataSource> from = queryFactory.select(dataSource).from(dataSource);
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         /*if (user != null && "admin".equalsIgnoreCase(user.getRole())) {
             if (user == null) {
-                throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+                throw new RuntimeException("no user found with name " + "DESC");
             }
             from.where(dataSource.creatorId.eq(user.getId()));
         }*/
@@ -224,12 +228,12 @@ public class DataSourceResource {
         if (ids == null || ids.length == 0) {
             return Response.status(Response.Status.BAD_REQUEST).entity("ids can't be null or empty").build();
         }
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         for (Long id : ids) {
             DataSource dataSource = dataSourceRepository.findById(id.longValue()).get();
             if (user != null && "admin".equalsIgnoreCase(user.getRole())) {
                 if (user == null) {
-                    throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+                    throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
                 if (user.getId().longValue() != dataSource.creatorId.longValue()) {
                     throw new RuntimeException("no available datasource for user " + user.chineseName);

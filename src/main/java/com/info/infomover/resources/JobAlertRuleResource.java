@@ -4,7 +4,7 @@ import com.info.infomover.entity.AlertRule;
 import com.info.infomover.entity.JobAlertRule;
 import com.info.infomover.entity.User;
 import com.info.infomover.repository.*;
-import com.info.infomover.util.UserUtil;
+import com.info.infomover.security.SecurityUtils;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -43,9 +43,9 @@ public class JobAlertRuleResource {
     @Transactional
     @RolesAllowed({"User", "Admin"})
     public Response createOrUpdate( @PathVariable("jobId") Long jobId, @RequestBody List<JobAlertRule> jars) {
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         if (user == null) {
-            throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+            throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
         }
         if (jobId == null) {
             throw new RuntimeException("job id is empty ");
@@ -73,9 +73,9 @@ public class JobAlertRuleResource {
 
     @GetMapping("/list")
     public Response list( @RequestParam(value = "jobId",required = false)  Long jobId) {
-        User user = userRepository.findByName(UserUtil.getUserName());
+        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
         if (user == null) {
-            throw new RuntimeException("no user found with name " + UserUtil.getUserName());
+            throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
         }
         if (jobId == null) {
             throw new RuntimeException("job id is empty ");
