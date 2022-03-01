@@ -6,7 +6,6 @@
 package com.io.debezium.configserver.rest.client;
 
 import com.io.debezium.configserver.model.ConnectConnectorConfigResponse;
-import com.io.debezium.configserver.model.ConnectConnectorStatusResponse;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -35,7 +34,7 @@ public interface KafkaConnectClient extends AutoCloseable{
     @GET
     @Path("/connectors/{connector-name}/status")
     @Produces("application/json")
-    ConnectConnectorStatusResponse getConnectorStatus(@PathParam("connector-name") String connectorName) throws ProcessingException, IOException;
+    String getConnectorStatus(@PathParam("connector-name") String connectorName) throws ProcessingException, IOException;
 
     @DELETE
     @Path("/connectors/{connector-name}")

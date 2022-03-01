@@ -8,7 +8,6 @@ import com.info.infomover.prom.constants.Operator;
 import com.info.infomover.prom.constants.StepDuration;
 import com.info.infomover.repository.AlertRuleRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import io.quarkus.runtime.StartupEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.enterprise.event.Observes;
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +59,8 @@ public class AlertRuleInitializer {
 
     public static final Map<String, AlertRule> builtinRuleMap = new HashMap<>();
 
-    public void start(@Observes StartupEvent event) {
+    @PostConstruct
+    public void start() {
         logger.info("server start at {}", LocalDateTime.now());
         // init runFailRule check connector status in kafka cluster
         // 对所有的任务生效，即使存在关联的custom AlertRule，也优先进行该规则检查

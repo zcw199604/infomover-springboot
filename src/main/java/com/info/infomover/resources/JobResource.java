@@ -1,5 +1,6 @@
 package com.info.infomover.resources;
 
+import com.info.baymax.common.utils.JsonUtils;
 import com.info.infomover.common.Log;
 import com.info.infomover.common.LogConst;
 import com.info.infomover.common.Logged;
@@ -1869,7 +1870,8 @@ public class JobResource {
             ConnectConnectorConfigResponse connectorInfo = kafkaConnectClient.getConnectorInfo(connectorName);
             String connectorTypeClass = connectorInfo.getConfig().get("connector.class");
             logger.debug("Kafka Connect connector status details: " + connectorInfo);
-            ConnectConnectorStatusResponse connectorStatus = kafkaConnectClient.getConnectorStatus(connectorName);
+            String connectorStatus1 = kafkaConnectClient.getConnectorStatus(connectorName);
+            ConnectConnectorStatusResponse connectorStatus = JsonUtils.fromJson(connectorStatus1,ConnectConnectorStatusResponse.class);
             connectorState.setConnectorType(connectorTypeClass);
             if (connectorState.getConnectorType().toLowerCase().equals("jdbcsink")) {
                 String url = connectorInfo.getConfig().get(SinkConnectorKeyword.SINK_URL);

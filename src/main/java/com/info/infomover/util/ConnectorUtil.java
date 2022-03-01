@@ -28,7 +28,8 @@ public class ConnectorUtil {
     public static ConnectorStatus.State connectorStatus(Long cluster, String connector) throws IOException {
         try {
             KafkaConnectClient client = KafkaConnectClientFactory.getClient(cluster);
-            ConnectConnectorStatusResponse connectorStatus = client.getConnectorStatus(connector);
+            String connectorStatus1 = client.getConnectorStatus(connector);
+            ConnectConnectorStatusResponse connectorStatus = JsonUtils.fromJson(connectorStatus1,ConnectConnectorStatusResponse.class);
             if (connectorStatus.connectorStatus.status.equals(ConnectorStatus.State.RUNNING)) {
                 for (ConnectTaskStatus taskState : connectorStatus.taskStates) {
                     if (!taskState.status.equals(ConnectorStatus.State.RUNNING)) {

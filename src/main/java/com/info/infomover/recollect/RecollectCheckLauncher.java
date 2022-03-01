@@ -1,5 +1,6 @@
 package com.info.infomover.recollect;
 
+import com.info.baymax.common.utils.JsonUtils;
 import com.info.infomover.entity.Connector;
 import com.info.infomover.entity.Job;
 import com.info.infomover.repository.JobRepository;
@@ -190,7 +191,8 @@ public class RecollectCheckLauncher implements Runnable {
             ConnectConnectorConfigResponse connectorInfo = kafkaConnectClient.getConnectorInfo(connectorName);
             String connectorTypeClass = connectorInfo.getConfig().get("connector.class");
             log.debug("Kafka Connect connector status details: " + connectorInfo);
-            ConnectConnectorStatusResponse connectorStatus = kafkaConnectClient.getConnectorStatus(connectorName);
+            String connectorStatus1 = kafkaConnectClient.getConnectorStatus(connectorName);
+            ConnectConnectorStatusResponse connectorStatus = JsonUtils.fromJson(connectorStatus1,ConnectConnectorStatusResponse.class);
             connectorState.setConnectorType(connectorTypeClass);
             if(connectorState.getConnectorType().toLowerCase().equals("jdbcsink")){
                 String url = connectorInfo.getConfig().get(SinkConnectorKeyword.SINK_URL);

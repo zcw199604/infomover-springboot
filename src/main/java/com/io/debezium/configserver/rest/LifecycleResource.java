@@ -5,6 +5,7 @@
  */
 package com.io.debezium.configserver.rest;
 
+import com.info.baymax.common.utils.JsonUtils;
 import com.info.infomover.entity.Connector;
 import com.info.infomover.entity.Job;
 import com.info.infomover.repository.ConnectorRepository;
@@ -121,7 +122,8 @@ public class LifecycleResource {
         for (String connectorName : connectorNames) {
             ConnectorStatus connectorState = new ConnectorStatus(connectorName);
             try {
-                ConnectConnectorStatusResponse connectorStatus = kafkaConnectClient.getConnectorStatus(connectorName);
+                String connectorStatus1 = kafkaConnectClient.getConnectorStatus(connectorName);
+                ConnectConnectorStatusResponse connectorStatus = JsonUtils.fromJson(connectorStatus1,ConnectConnectorStatusResponse.class);
                 connectorState.setConnectorStatus(connectorStatus.connectorStatus.status);
                 ConnectorStatus.State status = connectorStatus.connectorStatus.status;
                 if (status != state) {

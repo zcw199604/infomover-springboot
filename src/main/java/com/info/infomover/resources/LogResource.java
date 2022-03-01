@@ -83,7 +83,7 @@ public class LogResource {
     //@Operation(description = "根据connector名称查询对应日志")
     @RolesAllowed({"User", "Admin"})
     public Response findConnectorLog(@PathVariable("connectorName") String connectorName,
-                                     @RequestParam(value = "offset",required = false)  int offset,
+                                     @RequestParam(value = "offset",defaultValue = "0",required = false)  int offset,
                                      @RequestParam(value = "limit",required = false)  int limit,
                                      @RequestParam(value = "level",required = false)  String level,
                                      @RequestParam(value = "searchWord",required = false)  String searchWord,

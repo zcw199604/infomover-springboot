@@ -5,6 +5,7 @@
  */
 package com.io.debezium.configserver.rest;
 
+import com.info.baymax.common.utils.JsonUtils;
 import com.info.infomover.common.Logged;
 import com.info.infomover.common.setting.DataSourceLoader;
 import com.info.infomover.common.setting.SinkLoader;
@@ -534,8 +535,13 @@ public class ConnectorResource {
 //                                        return null;
 //                                    }
                             LOGGER.debug("Kafka Connect connector status details: " + connectorInfo);
-                            var connectorStatus = kafkaConnectClient.getConnectorStatus(connectorName);
-                            var connectorState = new ConnectorStatus(connectorName);
+
+                            String connectorStatus1 = kafkaConnectClient.getConnectorStatus(connectorName);
+                            ConnectConnectorStatusResponse connectorStatus = JsonUtils.fromJson(connectorStatus1,ConnectConnectorStatusResponse.class);
+                            //var connectorStatus = kafkaConnectClient.getConnectorStatus(connectorName);
+
+                            //var connectorState = new ConnectorStatus(connectorName);
+                            ConnectorStatus connectorState = new ConnectorStatus(connectorName);
                             connectorState.setConnectorType(connectorType);
                             connectorState.setConnectorStatus(connectorStatus.connectorStatus.status);
                             connectorState.setDbServerName(connectorInfo.getConfig().get("database.server.name"));
