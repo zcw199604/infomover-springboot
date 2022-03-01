@@ -11,7 +11,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,34 +38,15 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional
     public List<Connector> findSourceConnectors(Job job) {
-
-        List<Connector> list = new ArrayList<>();
-
-        for (int i = 0; i < job.getConnectors().size(); i++) {
-            if (job.getConnectors().get(i).category == Connector.Category.Source) {
-                Connector temp = new Connector();
-                BeanUtils.copyProperties(job.getConnectors().get(i), temp);
-                list.add(temp);
-            }
-        }
-        List<Long> collect = job.getConnectors().stream()
-                .filter(connector -> connector.category == Connector.Category.Source).map(item -> item.getId()).collect(Collectors.toList());
-
-
-
-        List<Connector> allById = connectorRepository.findAllById(collect);
-        return allById;
+        return job.getConnectors().stream()
+                        .filter(connector -> connector.category == Connector.Category.Source).collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public List<Connector> findSinkConnectors(Job job) {
-        List<Long> collect = job.getConnectors().stream()
-                .filter(connector -> connector.category == Connector.Category.Sink).map(item -> item.getId()).collect(Collectors.toList());
-
-
-        List<Connector> allById = connectorRepository.findAllById(collect);
-        return allById;
+        return job.getConnectors().stream()
+                .filter(connector -> connector.category == Connector.Category.Sink).collect(Collectors.toList());
     }
 
 
@@ -75,16 +55,18 @@ public class JobServiceImpl implements JobService {
         if (CollectionUtils.isEmpty(job.getConnectors())) {
             throw new RuntimeException("job connectors is null");
         }
-        List<Long> collect = job.getConnectors().stream()
+        /*List<Long> collect = job.getConnectors().stream()
                 .filter(connector -> connector.category == Connector.Category.Source).map(item -> item.getId()).collect(Collectors.toList());
 
 
-        List<Connector> allById = connectorRepository.findAllById(collect);
+        List<Connector> allById = connectorRepository.findAllById(collect);*/
+        List<Connector> collect = job.getConnectors().stream()
+                .filter(connector -> connector.category == Connector.Category.Source).collect(Collectors.toList());
 
-        CheckUtil.checkTrue(CollectionUtils.isEmpty(allById),"job connectors does not contain source connector");
-        CheckUtil.checkTrue(allById.size() != 1,"job source connector size greater than 1 ");
+        CheckUtil.checkTrue(CollectionUtils.isEmpty(collect),"job connectors does not contain source connector");
+        CheckUtil.checkTrue(collect.size() != 1,"job source connector size greater than 1 ");
 
-        return allById.get(0);
+        return collect.get(0);
     }
 
     @Override

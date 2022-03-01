@@ -1779,7 +1779,7 @@ public class JobResource {
 //            List<Connector> connectors = job.connectors;
 
             QueryResults<Connector> connectorQueryResults = from.orderBy(connectorT.category.asc()
-                    ,connectorT.id.asc()).offset(pageNum - 1).limit(pageSize).fetchResults();
+                    ,connectorT.id.asc()).offset(Page.getOffest(pageNum,pageSize)).limit(pageSize).fetchResults();
             List<Connector> connectors = connectorQueryResults.getResults();
             pageData.put("totalElements", connectorQueryResults.getTotal());
             for (Connector connector : connectors) {
@@ -1804,7 +1804,7 @@ public class JobResource {
             from.where(connectorT.category.eq(Connector.Category.Sink));
 
             QueryResults<Connector> connectorQueryResults = from.orderBy(connectorT.category.asc()
-                    ,connectorT.id.asc()).offset(pageNum - 1).limit(pageSize).fetchResults();
+                    ,connectorT.id.asc()).offset(Page.getOffest(pageNum,pageSize)).limit(pageSize).fetchResults();
             List<Connector> sinkConnectors = connectorQueryResults.getResults();
 
             pageData.put("totalElements", connectorQueryResults.getTotal());

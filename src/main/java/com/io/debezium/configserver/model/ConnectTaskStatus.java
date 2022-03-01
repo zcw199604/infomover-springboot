@@ -6,10 +6,14 @@
 package com.io.debezium.configserver.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Arrays;
 import java.util.List;
 
+@Getter
+@Setter
 public class ConnectTaskStatus {
 
     public Long id;

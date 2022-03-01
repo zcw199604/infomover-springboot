@@ -6,8 +6,12 @@
 package com.io.debezium.configserver.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import lombok.Getter;
+import lombok.Setter;
 
 
+@Getter
+@Setter
 public class ConnectConnectorStatus {
 
     @JsonAlias("state")
