@@ -9,7 +9,6 @@ import com.io.debezium.configserver.model.*;
 import io.debezium.config.Configuration;
 import io.debezium.config.EnumeratedValue;
 import io.debezium.config.Field;
-import com.io.debezium.configserver.model.*;
 import io.debezium.connector.mysql.MySqlConnector;
 import io.debezium.connector.oracle.OracleConnector;
 import io.debezium.connector.oracle.OracleConnectorConfig;
@@ -147,7 +146,7 @@ public abstract class ConnectorIntegratorBase implements ConnectorIntegrator {
 
         ConnectorProperty compressionType = new ConnectorProperty("topic.creation.default.compression.type",
                 "压缩方式", "压缩方式",
-                ConnectorProperty.Type.STRING, "producer", false, ConnectorProperty.Category.CONNECTION, Arrays.asList(new String[]{"producer","uncompressed","gzip", "snappy"}),false, true);
+                ConnectorProperty.Type.STRING, "zstd", false, ConnectorProperty.Category.CONNECTION, Arrays.asList(new String[]{"producer","uncompressed","gzip", "snappy", "zstd", "lz4"}),false, true);
 
         ConnectorProperty retentionMs = new ConnectorProperty("topic.creation.default.retention.ms",
                 "保留时间", "保留时间",

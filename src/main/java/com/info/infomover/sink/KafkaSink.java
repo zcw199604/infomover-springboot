@@ -14,7 +14,7 @@ public class KafkaSink{
     @JsonAlias("datasource.name")
     private String name;
 
-    @Setting(description = "bootstrap地址", displayName = "bootstrap地址")
+    @Setting(description = "bootstrap地址", displayName = "bootstrap地址", disabled = true)
     @JsonAlias("bootstrap.servers")
     private String bootStrapServer;
 
