@@ -21,6 +21,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 //@Path(ConnectorURIs.API_PREFIX)
 @RequestMapping(ConnectorURIs.API_PREFIX)
 @ResponseBody
+@Controller
 public class LifecycleResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LifecycleResource.class);
@@ -115,7 +117,7 @@ public class LifecycleResource {
         }
         LOGGER.debug("Kafka Connect response: " + result.readEntity(String.class));
 
-        return result;
+        return Response.ok().build();
     }
 
     private boolean checkAllConnectStatus(KafkaConnectClient kafkaConnectClient, List<String> connectorNames, int clusterId, ConnectorStatus.State state) {
@@ -211,7 +213,7 @@ public class LifecycleResource {
         }
         LOGGER.debug("Kafka Connect response: " + result.readEntity(String.class));
 
-        return result;
+        return Response.ok().build();
     }
 
     @PostMapping(ConnectorURIs.CONNECTOR_RESTART_ENDPOINT)
@@ -312,7 +314,7 @@ public class LifecycleResource {
         }
         LOGGER.debug("Kafka Connect response: " + result.readEntity(String.class));
 
-        return Response.fromResponse(result).type(MediaType.APPLICATION_JSON_TYPE).build();
+        return Response.ok().build();
     }
 
 }

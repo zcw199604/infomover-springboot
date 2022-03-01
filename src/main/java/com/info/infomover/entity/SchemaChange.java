@@ -1,5 +1,6 @@
 package com.info.infomover.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
 import javax.persistence.Column;
@@ -22,6 +23,7 @@ public class SchemaChange extends AbstractPersistable<Long> implements Serializa
     public String changeLogDiffSQL;
 
     //@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(columnDefinition = "DATETIME")
     public LocalDateTime createTime;
 

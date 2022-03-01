@@ -5,6 +5,7 @@
  */
 package com.io.debezium.configserver.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.info.infomover.entity.Connector;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class ConnectorStatus {
     private Long clusterId;
     private Connector.Category category;
     //@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastEventTime;
     private final Map<Long, TaskStatus> taskStates = new HashMap<>();
 

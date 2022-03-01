@@ -232,8 +232,8 @@ public class DashboardResource {
             JPAQuery<Job> from = queryFactory.select(job).from(job);
             from.where(job.deployStatus.eq(Job.DeployStatus.DEPLOYED));
 
-            User user = userRepository.findByName(userName);
-            if (User.Role.User.name().equals(user.getRole())) {
+            if (SecurityUtils.getCurrentRole().contains(User.Role.User.name())) {
+                User user = userRepository.findByName(userName);
                 if (user == null) {
                     throw new RuntimeException("no user found with name " + userName);
                 }

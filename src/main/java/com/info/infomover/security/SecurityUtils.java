@@ -1,19 +1,23 @@
 package com.info.infomover.security;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-
+import com.info.baymax.common.utils.ICollections;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.info.baymax.common.utils.ICollections;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class SecurityUtils {
 
 	public static Authentication getCurrentAuthentication() {
 		return SecurityContextHolder.getContext().getAuthentication();
+	}
+
+	public static Set<String> getCurrentRole() {
+		return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().map(item -> item.getAuthority()).collect(Collectors.toSet());
 	}
 
 	public static Collection<? extends GrantedAuthority> getCurrentUserGrantedAuthorities() {

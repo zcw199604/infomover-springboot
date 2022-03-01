@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -29,7 +28,7 @@ public class ConnectorServiceImpl implements ConnectorService {
         QConnector connector = QConnector.connector;
 
         return jpaQueryFactory.select(connector).from(connector).
-                where(connector.jobId.eq(jobId), connector.connectorStatus.eq(state)).fetchCount();
+                where(connector.jobId.eq(jobId), connector.connectorStatus.ne(state)).fetchCount();
     }
 
     @Override
@@ -60,15 +59,11 @@ public class ConnectorServiceImpl implements ConnectorService {
 
     @Override
     @Transactional
-    public void saveConnectorConfig(long connectorId, Map<String, String> config) {
-        Connector connector = connectorRepository.findById(connectorId).get();
+    public void saveConnectorConfig(Connector connector) {
         if (connector != null) {
-            Map<String, String> config1 = connector.getConfig();
-            config1.clear();
-            config1.putAll(config);
             connectorRepository.saveAndFlush(connector);
         } else {
-            log.error("Not found connector by id: {}", connectorId);
+            log.error("connect is empty");
         }
     }
 

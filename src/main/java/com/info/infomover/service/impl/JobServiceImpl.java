@@ -422,9 +422,10 @@ public class JobServiceImpl implements JobService {
                     } else if ("oracle".equals(stepDesc.getType())) {
                         config.put("connector.class", "io.debezium.connector.oracle.OracleConnector");
                     } else if ("postgres".equals(stepDesc.getType())) {
-                        // pg 需要修改solt.name 为随机值
-                        connector.config.remove("solt.name");
-                        config.put("solt.name", "debezium_" + UUID.randomUUID().toString().replace("-", ""));
+                        // pg 需要修改slot.name 为随机值
+                        connector.config.remove("slot.name");
+                        config.remove("slot.name");
+                        config.put("slot.name", "debezium_" + UUID.randomUUID().toString().replace("-", ""));
                         config.put("connector.class", "io.debezium.connector.postgresql.PostgresConnector");
                     }
                 }

@@ -1,6 +1,7 @@
 package com.info.infomover.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.info.baymax.common.validation.constraints.Password;
 import lombok.Data;
@@ -48,6 +49,7 @@ public class User extends AbstractPersistable<Long> {
 
     @Column(columnDefinition = "DATETIME")
     //@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     public LocalDateTime createTime;
 
     public String note;

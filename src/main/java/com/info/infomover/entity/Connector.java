@@ -1,5 +1,6 @@
 package com.info.infomover.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.info.infomover.common.convrter.TableMappingConverter;
 import com.io.debezium.configserver.model.ConnectorStatus;
 import lombok.Getter;
@@ -59,6 +60,7 @@ public class Connector extends AbstractPersistable<Long> implements Serializable
     private List<ConfigObject> tableMapping;
     
     //@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "last_event_time")
     private LocalDateTime lastEventTime;
 

@@ -8,7 +8,6 @@ import com.info.infomover.repository.AlertRuleRepository;
 import com.info.infomover.repository.JobAlertRuleRepository;
 import com.info.infomover.repository.UserRepository;
 import com.info.infomover.security.SecurityUtils;
-import com.info.infomover.util.UserUtil;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -71,7 +70,8 @@ public class AlertRuleResource {
 
         QAlertRule alertRule = QAlertRule.alertRule;
         JPAQuery<AlertRule> from = queryFactory.select(alertRule).from(alertRule);
-        if (UserUtil.getUserRole().equals(User.Role.User.name())) {
+
+        if (SecurityUtils.getCurrentRole().contains(User.Role.User.name())) {
             User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
             if (user == null) {
                 throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());

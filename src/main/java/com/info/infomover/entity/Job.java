@@ -1,5 +1,6 @@
 package com.info.infomover.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.info.infomover.common.convrter.LinkToStringConverter;
 import com.info.infomover.common.convrter.SetStringConverter;
 import com.info.infomover.common.convrter.StepToStringConverter;
@@ -51,10 +52,12 @@ public class Job extends AbstractPersistable<Long> implements Serializable {
 
     @Column(columnDefinition = "DATETIME")
     //@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     @Column(columnDefinition = "DATETIME")
     //@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 
     @OneToMany(
@@ -123,6 +126,7 @@ public class Job extends AbstractPersistable<Long> implements Serializable {
 
     
     //@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "last_event_time")
     private LocalDateTime lastEventTime;
 

@@ -171,8 +171,8 @@ public class ClusterResource {
 
         QCluster cluster = QCluster.cluster;
         JPAQuery<Cluster> from = queryFactory.select(cluster).from(cluster);
-        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
-        if (User.Role.User.name().equals(user.getRole())) {
+        if (SecurityUtils.getCurrentRole().contains(User.Role.User.name())) {
+            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
             if (user == null) {
                 throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
             }

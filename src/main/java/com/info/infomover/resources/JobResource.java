@@ -175,8 +175,8 @@ public class JobResource {
 
         QJob jobT = QJob.job;
         JPAQuery<Job> from = queryFactory.select(jobT).from(jobT);
-        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
-        if (User.Role.User.name().equals(user.getRole())) {
+        if (SecurityUtils.getCurrentRole().contains(User.Role.User.name())) {
+            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
             if (user == null) {
                 throw new RuntimeException("no user found with name " + User.Role.User.name().equals(user.getRole()));
             }
@@ -262,8 +262,8 @@ public class JobResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
-        if (User.Role.User.name().equals(user.getRole())) {
+        if (SecurityUtils.getCurrentRole().contains(User.Role.User.name())) {
+            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
             if (user == null) {
                 throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
             }
@@ -514,9 +514,9 @@ public class JobResource {
     public Response refresh(@RequestBody Long[] jobIds, @RequestParam(value = "recovery",required = false)  boolean recovery) {
         for (Long jobId : jobIds) {
 
-            Job userJob = jobRepository.findById(jobId.longValue()).get();
-            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
-            if (User.Role.User.name().equals(user.getRole())) {
+            Job userJob = jobService.findJobByIdAndLoadConnector(jobId.longValue());
+            if (SecurityUtils.getCurrentRole().contains(User.Role.User.name())) {
+                User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
                 if (user == null) {
                     throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
@@ -529,8 +529,8 @@ public class JobResource {
             }
             executorService.execute(() -> {
                         try {
-
-                            Job job = jobRepository.findById(jobId.longValue()).get();
+                            Job job = userJob;
+                            //Job job = jobRepository.findById(jobId.longValue()).get();
                             logger.info("executor refresh job ,jobId :{},recovery:{}", jobId, recovery);
                             if ((job.getDeployClusterId() == null && (job.getJobType() == Job.JobType.SYNC || (job.getJobType() == Job.JobType.COLLECT
                                     && job.getSinkRealType() == Job.SinkRealType.EXTERNAL))) && job.getDeployStatus() == Job.DeployStatus.UN_DEPLOYED) {
@@ -645,8 +645,8 @@ public class JobResource {
     public Response rebuild(@RequestBody Long[] jobIds) {
         for (Long jobId : jobIds) {
             Job userJob = jobService.findJobByIdAndLoadConnector(jobId.longValue());
-            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
-            if (User.Role.User.name().equals(user.getRole())) {
+            if (SecurityUtils.getCurrentRole().contains(User.Role.User.name())) {
+                User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
                 if (user == null) {
                     throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
@@ -702,7 +702,7 @@ public class JobResource {
             String serverId = connector.config.getOrDefault("database.server.id", "");
             if (StringUtils.isNotBlank(serverId)) {
                 connector.config.put("database.server.id", Integer.toString(Integer.parseInt(serverId) + 1));
-                connectorService.saveConnectorConfig(connector.getId(), connector.config);
+                connectorService.saveConnectorConfig(connector);
             }
         }
         connectorService.updateConnectName(connector.getId(), connectName);
@@ -906,7 +906,7 @@ public class JobResource {
         String snapshotMode = connector.config.get("snapshot.mode");
         connector.config.put("snapshot.mode", "schema_only_recovery");
 
-        connectorService.saveConnectorConfig(connector.getId(), connector.config);
+        connectorService.saveConnectorConfig(connector);
         logger.info("update connect snapshot.mode , connectName :{} , mode {} ->{}", connector.name, snapshotMode, "schema_only_recovery");
         // 3.修改steps里的source的 otherConfigurations
         List<StepDesc> collect = job.getSteps().stream().filter(item -> Job.StepType.sources.name().equals(item.getScope())).collect(Collectors.toList());
@@ -924,8 +924,8 @@ public class JobResource {
         List<ActionStatus> response = new ArrayList<>();
         for (Long jobId : jobDeployParam.getJobIds()) {
             Job job = jobRepository.findById(jobId.longValue()).get();
-            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
-            if (User.Role.User.name().equals(user.getRole())) {
+            if (SecurityUtils.getCurrentRole().contains(User.Role.User.name())) {
+                User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
                 if (user == null) {
                     throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
@@ -1218,7 +1218,7 @@ public class JobResource {
         for (Long jobId : jobIds) {
             Job job = jobRepository.findById(jobId.longValue()).get();
             User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
-            if (User.Role.User.name().equals(user.getRole())) {
+            if (SecurityUtils.getCurrentRole().contains(User.Role.User.name())) {
                 if (user == null) {
                     throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
@@ -1298,8 +1298,8 @@ public class JobResource {
     public Response resume(@RequestBody Long[] jobIds) {
         for (Long jobId : jobIds) {
             Job job = jobRepository.findById(jobId.longValue()).get();
-            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
-            if (User.Role.User.name().equals(user.getRole())) {
+            if (SecurityUtils.getCurrentRole().contains(User.Role.User.name())) {
+                User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
                 if (user == null) {
                     throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
@@ -1376,8 +1376,8 @@ public class JobResource {
     public Response restart( @RequestBody Long[] jobIds) {
         for (Long jobId : jobIds) {
             Job job = jobRepository.findById(jobId.longValue()).get();
-            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
-            if (User.Role.User.name().equals(user.getRole())) {
+            if (SecurityUtils.getCurrentRole().contains(User.Role.User.name())) {
+                User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
                 if (user == null) {
                     throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
                 }
@@ -1752,8 +1752,8 @@ public class JobResource {
         if (job == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
-        if (User.Role.User.name().equals(user.getRole())) {
+        if (SecurityUtils.getCurrentRole().contains(User.Role.User.name())) {
+            User user = userRepository.findByName(SecurityUtils.getCurrentUserUsername());
             if (user == null) {
                 throw new RuntimeException("no user found with name " + SecurityUtils.getCurrentUserUsername());
             }
@@ -1779,8 +1779,8 @@ public class JobResource {
         if (job.getJobType() == Job.JobType.SYNC || (job.getJobType() == Job.JobType.COLLECT && job.getSinkRealType() == Job.SinkRealType.EXTERNAL)) {
 //            List<Connector> connectors = job.connectors;
 
-            QueryResults<Connector> connectorQueryResults = from.orderBy(connectorT.category.asc()
-                    ,connectorT.id.asc()).offset(Page.getOffest(pageNum,pageSize)).limit(pageSize).fetchResults();
+            QueryResults<Connector> connectorQueryResults = from.orderBy(connectorT.category.desc()
+                    ,connectorT.id.desc()).offset(Page.getOffest(pageNum,pageSize)).limit(pageSize).fetchResults();
             List<Connector> connectors = connectorQueryResults.getResults();
             pageData.put("totalElements", connectorQueryResults.getTotal());
             for (Connector connector : connectors) {
@@ -1804,8 +1804,8 @@ public class JobResource {
             //List<Connector> sinkConnectors = job.findSinkConnectors()
             from.where(connectorT.category.eq(Connector.Category.Sink));
 
-            QueryResults<Connector> connectorQueryResults = from.orderBy(connectorT.category.asc()
-                    ,connectorT.id.asc()).offset(Page.getOffest(pageNum,pageSize)).limit(pageSize).fetchResults();
+            QueryResults<Connector> connectorQueryResults = from.orderBy(connectorT.category.desc()
+                    ,connectorT.id.desc()).offset(Page.getOffest(pageNum,pageSize)).limit(pageSize).fetchResults();
             List<Connector> sinkConnectors = connectorQueryResults.getResults();
 
             pageData.put("totalElements", connectorQueryResults.getTotal());

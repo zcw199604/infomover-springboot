@@ -1,5 +1,6 @@
 package com.info.infomover.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.springframework.data.jpa.domain.AbstractPersistable;
 
@@ -32,6 +33,7 @@ public class Alert extends AbstractPersistable<Long> implements Serializable {
     
     @Column(columnDefinition = "DATETIME")
     //@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     public LocalDateTime createTime;
     
     @Enumerated(EnumType.STRING)
@@ -46,6 +48,7 @@ public class Alert extends AbstractPersistable<Long> implements Serializable {
     
     @Column(columnDefinition = "DATETIME")
     //@JsonbDateFormat(value = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd HH:mm:ss")
     public LocalDateTime updateTime;
     public Long lastModifierId;
     public String lastModifier;

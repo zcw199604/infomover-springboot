@@ -95,7 +95,7 @@ public class RecollectJobLauncher implements Runnable {
             String snapshotMode = connector.config.get("snapshot.mode");
             if ("schema_only_recovery".equals(snapshotMode)) {
                 connector.config.put("snapshot.mode", SNAPSHOT_MODE);
-                connectorService.saveConnectorConfig(connector.getId(), connector.config);
+                connectorService.saveConnectorConfig(connector);
 
                 log.info("jobId [{}] ,source connect snapshot.mode is [{}] should be updated to [{}]", jobId, snapshotMode, SNAPSHOT_MODE);
                 // 3.修改steps里的source的 otherConfigurations
